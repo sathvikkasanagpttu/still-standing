@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { ChevronDown, BookOpen, Sparkles } from 'lucide-react';
+import { ChevronDown, BookOpen, Sparkles, Printer } from 'lucide-react';
 import { STORY_METADATA } from '../data/storyData';
 
 interface StillStandingHeroProps {
@@ -75,16 +75,16 @@ export const StillStandingHero: React.FC<StillStandingHeroProps> = ({ onBeginRea
         {/* Pull-Quote Dedication Card */}
         <div className="relative max-w-2xl rounded-2xl border border-slate-800/80 bg-slate-900/50 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
           <div className="font-serif italic text-base sm:text-lg leading-relaxed text-slate-200">
-            “{STORY_METADATA.dedication[0]}
+            &ldquo;{STORY_METADATA.dedication[0]}
             <br />
             <span className="mt-2 block text-slate-300">
-              {STORY_METADATA.dedication[1]}”
+              {STORY_METADATA.dedication[1]}&rdquo;
             </span>
           </div>
         </div>
 
-        {/* CTA Button */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
+        {/* CTA Buttons */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <button
             onClick={onBeginReading}
             className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full bg-gradient-to-r from-sky-500 via-sky-400 to-amber-400 px-8 py-4 font-sans text-sm font-semibold text-slate-950 shadow-xl shadow-sky-500/20 transition-all duration-300 hover:scale-105 hover:shadow-sky-500/30"
@@ -93,11 +93,21 @@ export const StillStandingHero: React.FC<StillStandingHeroProps> = ({ onBeginRea
             <span>Begin Reading</span>
             <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
           </button>
+
+          <button
+            onClick={() => {
+              if (typeof window !== 'undefined') window.print();
+            }}
+            className="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/80 px-6 py-4 font-sans text-sm font-medium text-slate-300 hover:border-slate-600 hover:text-white transition-all backdrop-blur-md shadow-lg"
+          >
+            <Printer className="h-4 w-4 text-sky-400" />
+            <span>Download Manuscript (PDF)</span>
+          </button>
         </div>
       </div>
 
       {/* Bottom Scroll Indicator */}
-      <div className="relative z-20 pb-8 text-center">
+      <div className="relative z-20 pb-8 text-center no-print">
         <button
           onClick={onBeginReading}
           className="inline-flex flex-col items-center gap-2 text-xs font-mono text-slate-500 hover:text-slate-300 transition-colors"

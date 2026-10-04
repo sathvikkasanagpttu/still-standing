@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Clock, Quote, Share2, Check, Bookmark, Sparkles } from 'lucide-react';
+import { Clock, Quote, Share2, Check } from 'lucide-react';
 import { StoryChapter } from '../types/story';
 
 interface ChapterCardProps {
@@ -45,10 +45,14 @@ export const ChapterCard: React.FC<ChapterCardProps> = ({
   };
 
   const copyPullQuote = () => {
-    if (chapter.pullQuote) {
-      navigator.clipboard.writeText(`"${chapter.pullQuote}" — STILL STANDING`);
-      setCopiedQuote(true);
-      setTimeout(() => setCopiedQuote(false), 2000);
+    if (chapter.pullQuote && typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(`"${chapter.pullQuote}" — STILL STANDING`)
+        .then(() => {
+          setCopiedQuote(true);
+          setTimeout(() => setCopiedQuote(false), 2000);
+        })
+        .catch(() => {});
     }
   };
 
@@ -83,6 +87,7 @@ export const ChapterCard: React.FC<ChapterCardProps> = ({
                 onClick={copyPullQuote}
                 className="flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900/60 px-2.5 py-1 text-[11px] font-mono text-slate-400 hover:text-sky-300 hover:border-slate-700 transition-colors"
                 title="Copy pull quote"
+                aria-label={`Copy quote from ${chapter.title}`}
               >
                 {copiedQuote ? (
                   <>
@@ -117,7 +122,7 @@ export const ChapterCard: React.FC<ChapterCardProps> = ({
                 alt={chapter.image.alt}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
-                sizes="(max-w-768px) 100vw, 768px"
+                sizes="(max-width: 768px) 100vw, 768px"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
             </div>
@@ -144,7 +149,6 @@ export const ChapterCard: React.FC<ChapterCardProps> = ({
         {/* Chapter Story Paragraphs */}
         <div className={`space-y-6 ${getFontFamilyClass()} ${getFontSizeClass()} text-slate-300 font-normal`}>
           {chapter.paragraphs.map((p, idx) => {
-            // First paragraph styling with drop cap
             const isFirst = idx === 0;
             return (
               <p

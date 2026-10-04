@@ -2,9 +2,7 @@
 module.exports = {
   darkMode: 'class',
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
@@ -22,35 +20,9 @@ module.exports = {
         },
       },
       fontFamily: {
-        serif: [
-          'Charter',
-          'Merriweather',
-          'Georgia',
-          'Cambria',
-          '"Times New Roman"',
-          'serif',
-        ],
-        sans: [
-          '-apple-system',
-          'BlinkMacSystemFont',
-          'Inter',
-          '"Segoe UI"',
-          'Roboto',
-          'Helvetica',
-          'Arial',
-          'sans-serif',
-        ],
-        mono: [
-          'ui-monospace',
-          'SFMono-Regular',
-          'Menlo',
-          'Monaco',
-          'Consolas',
-          '"JetBrains Mono"',
-          '"Liberation Mono"',
-          '"Courier New"',
-          'monospace',
-        ],
+        serif: ['Merriweather', 'Georgia', 'Cambria', 'serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       animation: {
         'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

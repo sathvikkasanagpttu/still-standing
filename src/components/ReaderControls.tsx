@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Type, Sliders, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sliders, Eye, EyeOff, Printer } from 'lucide-react';
 
 interface ReaderControlsProps {
   fontStyle: 'serif' | 'sans' | 'mono';
@@ -22,26 +22,50 @@ export const ReaderControls: React.FC<ReaderControlsProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
+  const handlePrint = () => {
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
+  };
+
   return (
-    <div className="fixed top-5 right-5 z-40">
+    <div className="fixed top-5 right-5 z-40 no-print">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-full border border-slate-800 bg-slate-950/80 px-3 py-2 text-xs font-medium text-slate-300 shadow-xl backdrop-blur-md transition-all hover:border-slate-700 hover:text-white"
+        className="flex items-center gap-2 rounded-full border border-slate-800 bg-slate-950/80 px-3 py-2 text-xs font-medium text-slate-300 shadow-xl backdrop-blur-md transition-all hover:border-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-sky-400"
         aria-label="Typography and display settings"
+        aria-expanded={isOpen}
       >
         <Sliders className="h-4 w-4 text-sky-400" />
         <span className="hidden sm:inline font-sans">Reading Settings</span>
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-800 bg-slate-950/95 p-4 shadow-2xl backdrop-blur-xl">
+        <div
+          role="region"
+          aria-label="Reading Controls"
+          className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-800 bg-slate-950/95 p-4 shadow-2xl backdrop-blur-xl animate-fade-in"
+        >
           <div className="mb-3 flex items-center justify-between border-b border-slate-800/80 pb-2">
             <span className="font-mono text-xs text-slate-300 font-semibold uppercase tracking-wider">
               Reading Controls
             </span>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-xs text-slate-500 hover:text-slate-300"
+              className="text-xs text-slate-500 hover:text-slate-300 focus:outline-none"
+              aria-label="Close reading settings"
             >
               ✕
             </button>
@@ -128,12 +152,18 @@ export const ReaderControls: React.FC<ReaderControlsProps> = ({
           {/* Focus Mode */}
           <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-xs text-slate-300">
-              {focusMode ? <EyeOff className="h-3.5 w-3.5 text-amber-400" /> : <Eye className="h-3.5 w-3.5 text-slate-400" />}
-              <span>Distraction-Free Mode</span>
+              {focusMode ? (
+                <EyeOff className="h-3.5 w-3.5 text-amber-400" />
+              ) : (
+                <Eye className="h-3.5 w-3.5 text-slate-400" />
+              )}
+              <span>Distraction-Free</span>
             </div>
             <button
               onClick={() => setFocusMode(!focusMode)}
-              className={`h-5 w-9 rounded-full p-0.5 transition-colors ${
+              aria-label={focusMode ? 'Disable distraction-free mode' : 'Enable distraction-free mode'}
+              aria-pressed={focusMode}
+              className={`h-5 w-9 rounded-full p-0.5 transition-colors focus:outline-none focus:ring-1 focus:ring-amber-400 ${
                 focusMode ? 'bg-amber-500' : 'bg-slate-800'
               }`}
             >
@@ -142,6 +172,17 @@ export const ReaderControls: React.FC<ReaderControlsProps> = ({
                   focusMode ? 'translate-x-4' : 'translate-x-0'
                 }`}
               />
+            </button>
+          </div>
+
+          {/* Print / Download Manuscript (PDF) */}
+          <div className="pt-3 mt-3 border-t border-slate-800/80">
+            <button
+              onClick={handlePrint}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 px-3 py-2 text-xs font-mono text-slate-300 hover:text-white transition-colors"
+            >
+              <Printer className="h-3.5 w-3.5 text-sky-400" />
+              <span>Save Manuscript (PDF)</span>
             </button>
           </div>
         </div>

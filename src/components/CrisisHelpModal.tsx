@@ -1,17 +1,35 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Heart, Phone, X, Shield, ExternalLink, Check, Copy } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Heart, Phone, X, Shield, Check, Copy } from 'lucide-react';
 import { CRISIS_HELPLINES } from '../data/storyData';
 
 export const CrisisHelpModal: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [copiedNumber, setCopiedNumber] = useState<string | null>(null);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   const handleCopy = (num: string) => {
-    navigator.clipboard.writeText(num);
-    setCopiedNumber(num);
-    setTimeout(() => setCopiedNumber(null), 2500);
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(num)
+        .then(() => {
+          setCopiedNumber(num);
+          setTimeout(() => setCopiedNumber(null), 2500);
+        })
+        .catch(() => {});
+    }
   };
 
   return (
@@ -20,8 +38,9 @@ export const CrisisHelpModal: React.FC = () => {
       <div className="fixed bottom-6 left-6 z-50">
         <button
           onClick={() => setIsOpen(true)}
-          className="group flex items-center gap-2 rounded-full border border-rose-500/30 bg-slate-950/90 px-3.5 py-2 text-xs shadow-xl backdrop-blur-md transition-all duration-300 hover:border-rose-400/60 hover:bg-slate-900/90 hover:shadow-rose-950/20"
+          className="group flex items-center gap-2 rounded-full border border-rose-500/30 bg-slate-950/90 px-3.5 py-2 text-xs shadow-xl backdrop-blur-md transition-all duration-300 hover:border-rose-400/60 hover:bg-slate-900/90 hover:shadow-rose-950/20 focus:outline-none focus:ring-2 focus:ring-rose-400"
           title="Struggling with job pressure or isolation? Free 24/7 helplines"
+          aria-label="Open 24/7 mental health and emotional support resources"
         >
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
@@ -36,11 +55,20 @@ export const CrisisHelpModal: React.FC = () => {
 
       {/* Modal Dialog */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 p-6 sm:p-8 shadow-2xl">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="crisis-dialog-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
+          onClick={() => setIsOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 p-6 sm:p-8 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Background Glow */}
-            <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-rose-500/10 blur-3xl" />
-            <div className="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-sky-500/10 blur-3xl" />
+            <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-rose-500/10 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-sky-500/10 blur-3xl pointer-events-none" />
 
             {/* Header */}
             <div className="relative z-10 flex items-start justify-between pb-4 border-b border-slate-800/80">
@@ -49,7 +77,7 @@ export const CrisisHelpModal: React.FC = () => {
                   <Shield className="h-5 w-5 text-rose-400" />
                 </div>
                 <div>
-                  <h3 className="font-serif text-lg font-semibold text-slate-100">
+                  <h3 id="crisis-dialog-title" className="font-serif text-lg font-semibold text-slate-100">
                     You Are Not Alone
                   </h3>
                   <p className="text-xs text-slate-400">
@@ -59,7 +87,7 @@ export const CrisisHelpModal: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="rounded-full p-1 text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
+                className="rounded-full p-1 text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors focus:outline-none"
                 aria-label="Close dialog"
               >
                 <X className="h-5 w-5" />
@@ -103,6 +131,7 @@ export const CrisisHelpModal: React.FC = () => {
                         onClick={() => handleCopy(line.tel)}
                         className="rounded-xl border border-slate-800 bg-slate-800/60 p-2 text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition-colors"
                         title="Copy phone number"
+                        aria-label={`Copy phone number for ${line.name}`}
                       >
                         {copiedNumber === line.tel ? (
                           <Check className="h-4 w-4 text-emerald-400" />
@@ -112,6 +141,7 @@ export const CrisisHelpModal: React.FC = () => {
                       </button>
                       <a
                         href={`tel:${line.tel}`}
+                        aria-label={`Call ${line.name}`}
                         className="flex items-center gap-1.5 rounded-xl bg-sky-500/20 border border-sky-500/30 px-3 py-2 text-xs font-semibold text-sky-300 hover:bg-sky-500/30 transition-all"
                       >
                         <Phone className="h-3.5 w-3.5" />

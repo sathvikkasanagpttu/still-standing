@@ -8,6 +8,8 @@ export const ReadingProgress: React.FC = () => {
   const [currentChapter, setCurrentChapter] = useState<string>('Prologue');
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
     const handleScroll = () => {
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (totalHeight <= 0) return;
@@ -49,7 +51,7 @@ export const ReadingProgress: React.FC = () => {
         />
       </div>
 
-      {/* Floating mini status badge that appears once user starts scrolling past 5% */}
+      {/* Floating mini status badge that appears once user starts scrolling past 3% */}
       <div
         className={`pointer-events-none flex items-center justify-between px-4 py-2 transition-opacity duration-300 ${
           progress > 3 ? 'opacity-100' : 'opacity-0'

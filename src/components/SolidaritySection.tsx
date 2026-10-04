@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Heart, Sparkles, Share2, Copy, Check, MessageSquare } from 'lucide-react';
+import { Heart, Sparkles, Copy, Check } from 'lucide-react';
 
 export const SolidaritySection: React.FC = () => {
   const [standCount, setStandCount] = useState<number>(1428);
@@ -9,13 +9,20 @@ export const SolidaritySection: React.FC = () => {
   const [copiedQuote, setCopiedQuote] = useState<boolean>(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('still_standing_solidarity_count');
-    const voted = localStorage.getItem('still_standing_has_voted');
-    if (saved) {
-      setStandCount(parseInt(saved, 10));
-    }
-    if (voted === 'true') {
-      setHasStood(true);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const saved = localStorage.getItem('still_standing_solidarity_count');
+        const voted = localStorage.getItem('still_standing_has_voted');
+        if (saved) {
+          const parsed = parseInt(saved, 10);
+          if (!isNaN(parsed)) setStandCount(parsed);
+        }
+        if (voted === 'true') {
+          setHasStood(true);
+        }
+      }
+    } catch {
+      // In private browsing or storage disabled modes, continue gracefully
     }
   }, []);
 
@@ -24,16 +31,28 @@ export const SolidaritySection: React.FC = () => {
       const newCount = standCount + 1;
       setStandCount(newCount);
       setHasStood(true);
-      localStorage.setItem('still_standing_solidarity_count', newCount.toString());
-      localStorage.setItem('still_standing_has_voted', 'true');
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          localStorage.setItem('still_standing_solidarity_count', newCount.toString());
+          localStorage.setItem('still_standing_has_voted', 'true');
+        }
+      } catch {
+        // Storage disabled fallback
+      }
     }
   };
 
   const copyCoreMessage = () => {
     const text = `“The world may choose to judge you by a missing corporate badge, but the world does not see the war you fought simply to survive the night. You are still breathing. You are still standing.” — STILL STANDING`;
-    navigator.clipboard.writeText(text);
-    setCopiedQuote(true);
-    setTimeout(() => setCopiedQuote(false), 2000);
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          setCopiedQuote(true);
+          setTimeout(() => setCopiedQuote(false), 2000);
+        })
+        .catch(() => {});
+    }
   };
 
   return (
@@ -60,7 +79,9 @@ export const SolidaritySection: React.FC = () => {
           <div className="mt-8 flex flex-col items-center gap-3">
             <button
               onClick={handleStandWith}
-              className={`group inline-flex items-center gap-3 rounded-full px-8 py-4 font-sans text-sm font-semibold transition-all duration-300 ${
+              disabled={hasStood}
+              aria-label={hasStood ? 'You are standing in solidarity' : 'Stand in solidarity'}
+              className={`group inline-flex items-center gap-3 rounded-full px-8 py-4 font-sans text-sm font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-400 ${
                 hasStood
                   ? 'bg-rose-500/20 border border-rose-500/40 text-rose-300 cursor-default'
                   : 'bg-gradient-to-r from-sky-500 to-amber-500 text-slate-950 hover:scale-105 shadow-xl shadow-sky-500/20'
@@ -89,6 +110,7 @@ export const SolidaritySection: React.FC = () => {
 
             <button
               onClick={copyCoreMessage}
+              aria-label="Copy quote to clipboard"
               className="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/80 px-3.5 py-2 text-xs font-mono text-slate-300 hover:border-slate-700 hover:text-white transition-colors shrink-0"
             >
               {copiedQuote ? (

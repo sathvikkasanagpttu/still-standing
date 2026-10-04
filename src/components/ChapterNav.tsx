@@ -1,14 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { List, X, BookOpen, Clock, ChevronRight } from 'lucide-react';
-import { CHAPTERS, STORY_METADATA } from '../data/storyData';
+import { X, BookOpen, Clock, ChevronRight } from 'lucide-react';
+import { CHAPTERS } from '../data/storyData';
 
 export const ChapterNav: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeId, setActiveId] = useState<string>('prologue');
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const handleScroll = () => {
       const chapterElements = CHAPTERS.map((ch) => ({
         id: ch.id,
@@ -28,14 +30,29 @@ export const ChapterNav: React.FC = () => {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   const scrollTo = (id: string) => {
     setIsOpen(false);
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -44,7 +61,7 @@ export const ChapterNav: React.FC = () => {
       {/* Floating TOC Trigger Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed top-5 left-5 z-40 flex items-center gap-2 rounded-full border border-slate-800 bg-slate-950/80 px-3.5 py-2 text-xs font-medium text-slate-300 shadow-xl backdrop-blur-md transition-all hover:border-slate-700 hover:text-white"
+        className="fixed top-5 left-5 z-40 flex items-center gap-2 rounded-full border border-slate-800 bg-slate-950/80 px-3.5 py-2 text-xs font-medium text-slate-300 shadow-xl backdrop-blur-md transition-all hover:border-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-sky-400"
         aria-label="Table of Contents"
       >
         <BookOpen className="h-4 w-4 text-sky-400" />
@@ -54,6 +71,9 @@ export const ChapterNav: React.FC = () => {
       {/* Slide-over Drawer Backdrop */}
       {isOpen && (
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Table of Contents"
           className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm transition-opacity"
           onClick={() => setIsOpen(false)}
         >
@@ -73,7 +93,8 @@ export const ChapterNav: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="rounded-full p-1.5 text-slate-400 hover:bg-slate-900 hover:text-slate-100 transition-colors"
+                  className="rounded-full p-1.5 text-slate-400 hover:bg-slate-900 hover:text-slate-100 transition-colors focus:outline-none"
+                  aria-label="Close chapter menu"
                 >
                   <X className="h-5 w-5" />
                 </button>

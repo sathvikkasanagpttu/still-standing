@@ -65,14 +65,16 @@ export const StatHighlights: React.FC = () => {
   ];
 
   const scrollToChapter = (chapterId: string) => {
-    const el = document.getElementById(chapterId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById(chapterId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
   return (
-    <section className="my-16 px-4">
+    <section className="my-16 px-4" aria-labelledby="stat-ledger-heading">
       <div className="mx-auto max-w-5xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -80,7 +82,7 @@ export const StatHighlights: React.FC = () => {
               <Sparkles className="h-3.5 w-3.5" />
               <span>The Ledger of Survival</span>
             </div>
-            <h3 className="mt-1 font-serif text-xl sm:text-2xl text-slate-100 font-medium">
+            <h3 id="stat-ledger-heading" className="mt-1 font-serif text-xl sm:text-2xl text-slate-100 font-medium">
               Numbers that words can barely contain
             </h3>
           </div>
@@ -96,8 +98,18 @@ export const StatHighlights: React.FC = () => {
             return (
               <div
                 key={stat.id}
+                role="button"
+                tabIndex={0}
+                aria-expanded={isExpanded}
+                aria-label={`${stat.label}: ${stat.number}. ${stat.sublabel}`}
                 onClick={() => setSelectedStat(isExpanded ? null : stat.id)}
-                className={`group relative cursor-pointer overflow-hidden rounded-2xl border bg-gradient-to-b from-slate-900/90 to-slate-950/90 p-5 backdrop-blur-xl transition-all duration-300 ${
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedStat(isExpanded ? null : stat.id);
+                  }
+                }}
+                className={`group relative cursor-pointer overflow-hidden rounded-2xl border bg-gradient-to-b from-slate-900/90 to-slate-950/90 p-5 backdrop-blur-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-400 ${
                   isExpanded
                     ? 'border-sky-500/50 shadow-lg shadow-sky-500/10 -translate-y-1'
                     : 'border-slate-800/80 hover:border-slate-700 hover:-translate-y-0.5'
@@ -105,7 +117,7 @@ export const StatHighlights: React.FC = () => {
               >
                 {/* Glow accent */}
                 <div
-                  className={`absolute -top-12 -right-12 h-24 w-24 rounded-full blur-2xl transition-opacity duration-300 ${
+                  className={`absolute -top-12 -right-12 h-24 w-24 rounded-full blur-2xl transition-opacity duration-300 pointer-events-none ${
                     stat.themeColor === 'sky'
                       ? 'bg-sky-500/20 group-hover:bg-sky-500/30'
                       : stat.themeColor === 'amber'
@@ -145,14 +157,14 @@ export const StatHighlights: React.FC = () => {
                     }`}
                   >
                     <p className="italic text-slate-300 font-serif">
-                      "{stat.detail}"
+                      &ldquo;{stat.detail}&rdquo;
                     </p>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         scrollToChapter(stat.targetChapterId);
                       }}
-                      className="mt-3 inline-flex items-center gap-1 font-mono text-[11px] text-sky-400 hover:text-sky-300 font-medium"
+                      className="mt-3 inline-flex items-center gap-1 font-mono text-[11px] text-sky-400 hover:text-sky-300 font-medium focus:outline-none"
                     >
                       Read in chapter <ChevronRight className="h-3 w-3" />
                     </button>

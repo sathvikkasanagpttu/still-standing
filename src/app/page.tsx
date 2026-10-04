@@ -10,7 +10,10 @@ import { AmbientAudio } from '../components/AmbientAudio';
 import { ChapterCard } from '../components/ChapterCard';
 import { AuthorsNote } from '../components/AuthorsNote';
 import { StatHighlights } from '../components/StatHighlights';
-import { SolidaritySection } from '../components/SolidaritySection';
+import { EmotionalTimeline } from '../components/EmotionalTimeline';
+import { LedgerOfSilence } from '../components/LedgerOfSilence';
+import { WallOfExpectations } from '../components/WallOfExpectations';
+import { EncouragementWall } from '../components/EncouragementWall';
 import { TerminalReaderModal } from '../components/TerminalReaderModal';
 import { CrisisHelpModal } from '../components/CrisisHelpModal';
 import { Footer } from '../components/Footer';
@@ -45,6 +48,9 @@ export default function HomePage() {
       {/* Floating Chapter Index (Top Left) */}
       <ChapterNav />
 
+      {/* Interactive Emotional Journey Line (Fixed Left) */}
+      <EmotionalTimeline />
+
       {/* Hero Landing Section */}
       <StillStandingHero onBeginReading={handleBeginReading} />
 
@@ -54,29 +60,40 @@ export default function HomePage() {
       {/* Author's Note */}
       <AuthorsNote fontStyle={fontStyle} fontSize={fontSize} />
 
-      {/* Chapters in Chronological Order */}
+      {/* Chapters in Chronological Order with Narrative Interludes */}
       <div className="relative z-10">
         {CHAPTERS.map((chapter) => (
-          <ChapterCard
-            key={chapter.id}
-            chapter={chapter}
-            fontStyle={fontStyle}
-            fontSize={fontSize}
-            focusMode={focusMode}
-          />
+          <React.Fragment key={chapter.id}>
+            <ChapterCard
+              chapter={chapter}
+              fontStyle={fontStyle}
+              fontSize={fontSize}
+              focusMode={focusMode}
+            />
+
+            {/* Interactive "Ledger of Silence" right after Part IV (The 500+ Applications) */}
+            {chapter.id === 'part-4' && (
+              <LedgerOfSilence />
+            )}
+
+            {/* Interactive "Wall of Expectations" between Part V and Part VI */}
+            {chapter.id === 'part-5' && (
+              <WallOfExpectations />
+            )}
+          </React.Fragment>
         ))}
       </div>
 
-      {/* Solidarity Section */}
-      <SolidaritySection />
+      {/* Community Light Board & Encouragement Wall (After Part IX) */}
+      <EncouragementWall />
 
-      {/* Terminal Mode Viewer (Bottom Right Above Audio) */}
+      {/* Terminal Mode Reader Modal (Bottom Right Above Audio) */}
       <TerminalReaderModal />
 
-      {/* Procedural Ambient Audio Synthesizer (Rain & Night Drone) */}
+      {/* Procedural Ambient Audio Synthesizer (Rain, Deep Drone, Mechanical Keys) */}
       <AmbientAudio />
 
-      {/* Crisis Help Line & Emotional Support (Bottom Left) */}
+      {/* 24/7 Crisis Helpline & Mental Health Support (Bottom Left) */}
       <CrisisHelpModal />
 
       {/* Footer */}

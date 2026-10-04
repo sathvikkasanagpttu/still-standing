@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Heart, Sparkles, Shield, ArrowUp } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (
@@ -59,7 +61,8 @@ export const Footer: React.FC = () => {
         {/* Back to Top */}
         <button
           onClick={scrollToTop}
-          className="inline-flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900/80 px-4 py-2 font-mono text-xs text-slate-400 hover:border-slate-700 hover:text-slate-200 transition-all"
+          aria-label="Back to top"
+          className="inline-flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900/80 px-4 py-2 font-mono text-xs text-slate-400 hover:border-slate-700 hover:text-slate-200 transition-all focus:outline-none focus:ring-2 focus:ring-sky-400"
         >
           <ArrowUp className="h-3.5 w-3.5" />
           <span>Back to Top</span>

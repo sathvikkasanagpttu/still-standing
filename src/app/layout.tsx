@@ -3,11 +3,12 @@ import './globals.css';
 
 export const viewport: Viewport = {
   themeColor: '#030712',
-  colorScheme: 'dark',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://stillstanding.story'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://stillstanding.story'),
   title: 'STILL STANDING: A Story of Rejection, Loneliness, and Refusing to Disappear',
   description:
     'An interactive autobiographical novella and narrative reader about engineering placements, silent 3 AM tears in Hyderabad, and the quiet courage to keep opening the laptop.',
@@ -20,6 +21,13 @@ export const metadata: Metadata = {
     'Autobiography',
   ],
   authors: [{ name: 'Still Standing Author' }],
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/favicon.svg',
+  },
   openGraph: {
     title: 'STILL STANDING — A Story of Rejection, Loneliness, and Refusing to Disappear',
     description:
@@ -35,8 +43,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#030712] text-[#f3f4f6] antialiased selection:bg-sky-500 selection:text-slate-950 font-sans">
+    <html lang="en" className="dark scroll-smooth">
+      <body className="min-h-screen bg-[#030712] text-[#f3f4f6] font-sans antialiased selection:bg-sky-500 selection:text-slate-950">
         {children}
       </body>
     </html>
